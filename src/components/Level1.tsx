@@ -16,4 +16,6 @@ const Level1 = ({ }: Level1Props) => {
         </div>)
 }
  
+
+
 export default React.memo(Level1);
