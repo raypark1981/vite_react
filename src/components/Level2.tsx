@@ -1,3 +1,4 @@
+import React from 'react'
 import Level3 from '@/components/Level3'
 type Level2Props = {
 
@@ -13,4 +14,4 @@ const Level2 = ({ }: Level2Props) => {
     )
 }
 
-export default Level2
+export default React.memo(Level2)

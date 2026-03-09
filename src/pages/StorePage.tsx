@@ -32,9 +32,12 @@ const StorePage: React.FC = () => {
 
     // console.log('rendered StorPage count, text ',count, text)
 
+
+    // 쓸일이 있을 지 모르지만, 일단 적어 둠
     const temp = useStore(useShallow((state) => ([state.count, state.text])))
+    const [count, text] = useStore(useShallow((state) => ([state.count, state.text])))
     
-    console.log(temp)
+    console.log(count, text )
     return (<div>
         <h1>store page</h1>
         <button></button>

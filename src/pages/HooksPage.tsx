@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useCallback, useContext} from 'react'
 import Level1 from '@/components/Level1'
 import { AppContext } from '@/context/AppContext'
+import { useStore } from '@/store/StoreHandler'
 
 // 함수 선언언 export default function 함수명
 // export default function HooksPage(): React.JSX.Element { 
@@ -18,6 +19,7 @@ type HooksProps = {
 
 const HooksPage = ({ name, age }: HooksProps): React.JSX.Element => { 
     const appContext = useContext(AppContext);
+    const { text, changeText} = useStore();
 
     if (!appContext)
         return (<div>app context 없음</div>)
@@ -59,15 +61,16 @@ const HooksPage = ({ name, age }: HooksProps): React.JSX.Element => {
             <button onClick={() => { setCount((prev) => prev + 1) }}>Click me 함수 직접 넣기 </button>
             <button onClick={() => setOtherCount(prev => prev + 1)}>Click me ohter Button</button>
             <button onClick={() => callBackTest()} > callback testing</button>
+            <button onClick={() => changeText('Hello, Zustand!')} > store testing</button>
             {/* <button onClick={}>Click me 함수 안에 함수 넣기</button> */}
-            <Level1></Level1>
+            <Level1 name={themeColor}></Level1>
         </div>)
 }
 
 
 
 
-    
+
 // 함수형 컴포넌트는
 // const HooksPage: React.FC<HooksProps> = ({name}) => { 
 //     return <div>{name}</div>

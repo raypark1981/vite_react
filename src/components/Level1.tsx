@@ -7,7 +7,7 @@ type Level1Props = {
 
 const Level1 = ({ }: Level1Props) => {
 
-    console.log('Level1 rendered');
+    console.log('Level1 rendered'); 
 
     return (
         <div>

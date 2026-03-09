@@ -51,7 +51,7 @@ const CommonPopup: React.FC<CommonPopupProps> = () => {
 
                     {content}
                     
-                <CommonPopupContext ></CommonPopupContext>
+                    <CommonPopupContext ></CommonPopupContext>
                 </div>
 
                  
