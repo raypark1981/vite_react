@@ -4,6 +4,8 @@ import { useStore } from '@/store/StoreHandler'
 const StorePage: React.FC = () => {
     // const test = { a: 1 };
 
+
+
     // const user1 = { user: test }
     // const user2 = { user: test }
     
@@ -36,6 +38,8 @@ const StorePage: React.FC = () => {
     // 쓸일이 있을 지 모르지만, 일단 적어 둠
     const temp = useStore(useShallow((state) => ([state.count, state.text])))
     const [count, text] = useStore(useShallow((state) => ([state.count, state.text])))
+
+    console.log(11)
     
     console.log(count, text )
     return (<div>
