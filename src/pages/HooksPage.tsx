@@ -61,7 +61,7 @@ const HooksPage = ({ name, age }: HooksProps): React.JSX.Element => {
             <button onClick={() => { setCount((prev) => prev + 1) }}>Click me 함수 직접 넣기 </button>
             <button onClick={() => setOtherCount(prev => prev + 1)}>Click me ohter Button</button>
             <button onClick={() => callBackTest()} > callback testing</button>
-            <button onClick={() => changeText('Hello, Zustand!')} > store testing</button>
+            <button onClick={() => changeText('Hello, Zustand 스토어 변경함 in hook!')} > store testing</button>
             {/* <button onClick={}>Click me 함수 안에 함수 넣기</button> */}
             <Level1 name={themeColor}></Level1>
         </div>)
