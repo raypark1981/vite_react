@@ -5,7 +5,6 @@ const Navbar: React.FC = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
       <span className="navbar-brand fw-bold">📚 공부노트</span>
-
     </nav>
   );
 };
