@@ -25,7 +25,7 @@ const FolderTreeItem: React.FC<{
   return (
     <div>
       <div
-        className={`d-flex align-items-center py-1 px-2 rounded ${isSelected ? 'bg-primary text-white' : 'text-dark'}`}
+        className={`d-flex align-items-center py-1 rounded ${isSelected ? 'bg-primary text-white' : 'text-dark'}`}
         style={{ paddingLeft: `${depth * 14 + 8}px`, cursor: 'pointer' }}
         onClick={() => onSelect(folder.id)}
       >
@@ -76,7 +76,7 @@ const FolderTree: React.FC<Props> = ({ folders, selectedId, onSelect }) => {
         <span className="small fw-semibold">전체</span>
       </div>
 
-      {rootFolders.map(folder => (
+      {rootFolders.map((folder) => (
         <FolderTreeItem
           key={folder.id}
           folder={folder}

@@ -25,6 +25,7 @@ const FolderPage: React.FC = () => {
   const getBreadcrumb = (): Folder[] => {
     const path: Folder[] = [];
     let cur: string | null = selectedId;
+
     while (cur) {
       const found = folders.find(f => f.id === cur);
       if (!found) break;
@@ -46,13 +47,23 @@ const FolderPage: React.FC = () => {
       );
     } else {
       // 새 폴더 생성 (현재 위치 아래에 추가)
-      const newFolder: Folder = {
-        id: Date.now().toString(),
-        name: inputName.trim(),
-        parentId: selectedId,
-        createdAt: new Date().toISOString().split('T')[0],
-      };
-      setFolders(prev => [...prev, newFolder]);
+      setFolders(prev => {
+        const nextId = String(
+          prev
+            .map(f => Number(f.id))
+            .filter(Number.isFinite)
+            .reduce((max, id) => Math.max(max, id), 0) + 1
+        );
+
+        const newFolder: Folder = {
+          id: nextId,
+          name: inputName.trim(),
+          parentId: selectedId,
+          createdAt: new Date().toISOString().split('T')[0],
+        };
+
+        return [...prev, newFolder];
+      });
     }
     closeModal();
   };
