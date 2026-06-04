@@ -40,15 +40,15 @@ export default defineConfig([
       // other options...
     },
   },
-])
+]);
 ```
 
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js
 // eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+import reactX from 'eslint-plugin-react-x';
+import reactDom from 'eslint-plugin-react-dom';
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -69,5 +69,26 @@ export default defineConfig([
       // other options...
     },
   },
-])
+]);
 ```
+
+## Formatting Setup
+
+이 프로젝트는 VS Code에서 Prettier 포맷터를 사용해 저장 시 자동 포맷팅을 적용합니다.
+
+설치한 패키지:
+
+- `prettier`
+- `eslint-plugin-prettier`
+- `eslint-config-prettier`
+
+추가/수정된 프로젝트 파일:
+
+- `eslint.config.js`: 기본 ESLint 규칙 설정
+- `.prettierrc`: 포맷팅 옵션(한 줄 길이, 따옴표, trailing comma) 설정
+- `.prettierignore`: 포맷팅에서 제외할 파일/폴더 설정
+- `.vscode/settings.json`: 저장 시 ESLint 자동 수정 실행 설정
+
+유용한 명령어:
+
+- `pnpm lint`
