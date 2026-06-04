@@ -1,7 +1,18 @@
 // 폴더 데이터 타입 정의
-export type Folder = {
+export interface Folder {
   id: string;
   name: string;
-  parentId: string | null; // null = 최상위 폴더
-  createdAt: string;       // 'YYYY-MM-DD' 형식
-};
+  parentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateFolderInput {
+  name: string;
+  parentId: string | null;
+}
+
+export interface UpdateFolderInput {
+  name?: string;
+  parentId?: string | null;
+}

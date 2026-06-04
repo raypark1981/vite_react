@@ -1,22 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Folder } from '@/types/folder';
+import { getFolders, createFolder } from '@/api/folderApi';
 import FolderTree from '@/components/folder/FolderTree';
 import Navbar from '@/components/layout/Navbar';
 
 // 임시 초기 데이터 (추후 localStorage 또는 API로 교체)
-const INITIAL_FOLDERS: Folder[] = [
-  { id: '1', name: 'React',      parentId: null, createdAt: '2025-01-01' },
-  { id: '2', name: 'TypeScript', parentId: null, createdAt: '2025-01-02' },
-  { id: '3', name: 'Hooks',      parentId: '1',  createdAt: '2025-01-03' },
-  { id: '4', name: 'Components', parentId: '1',  createdAt: '2025-01-04' },
-];
+// const INITIAL_FOLDERS: Folder[] = [
+//   { id: '1', name: 'React',      parentId: null, createdAt: '2025-01-01' },
+//   { id: '2', name: 'TypeScript', parentId: null, createdAt: '2025-01-02' },
+//   { id: '3', name: 'Hooks',      parentId: '1',  createdAt: '2025-01-03' },
+//   { id: '4', name: 'Components', parentId: '1',  createdAt: '2025-01-04' },
+// ];
 
 const FolderPage: React.FC = () => {
-  const [folders, setFolders]       = useState<Folder[]>(INITIAL_FOLDERS);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null); // 현재 선택된 폴더 id
-  const [showModal, setShowModal]   = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [editTarget, setEditTarget] = useState<Folder | null>(null); // null = 새 폴더
-  const [inputName, setInputName]   = useState('');
+  const [inputName, setInputName] = useState('');
+
+  const loadFolder = async (): Promise<void> => {
+    // lint 경고 뜸 그래서 아래와 같이 변경
+    //   const loadFolder  = async () => {
+    //   try {
+    //     const data = await getFolders();
+    //     setFolders(data);
+    //   } catch (err: unknown) {
+    //     console.warn(err);
+    //   }
+    // };
+
+    getFolders()
+      .then(setFolders)
+      .catch((err: unknown) => {
+        console.warn(err);
+      });
+  };
 
   // 현재 위치의 직속 자식 폴더 목록
   const currentFolders = folders.filter(f => f.parentId === selectedId);
@@ -37,35 +56,29 @@ const FolderPage: React.FC = () => {
 
   // --- 폴더 CRUD ---
 
-  const handleSave = () => {
+  const handleSave = async (): Promise<void> => {
     if (!inputName.trim()) return;
 
-    if (editTarget) {
-      // 이름 변경
-      setFolders(prev =>
-        prev.map(f => f.id === editTarget.id ? { ...f, name: inputName.trim() } : f)
-      );
-    } else {
-      // 새 폴더 생성 (현재 위치 아래에 추가)
-      setFolders(prev => {
-        const nextId = String(
-          prev
-            .map(f => Number(f.id))
-            .filter(Number.isFinite)
-            .reduce((max, id) => Math.max(max, id), 0) + 1
+    try {
+      if (editTarget) {
+        // 이름 변경
+        setFolders(prev =>
+          prev.map(f => (f.id === editTarget.id ? { ...f, name: inputName.trim() } : f)),
         );
-
-        const newFolder: Folder = {
-          id: nextId,
+      } else {
+        // 새 폴더 생성: 서버 응답을 상태에 반영
+        const createdFolder = await createFolder({
           name: inputName.trim(),
           parentId: selectedId,
-          createdAt: new Date().toISOString().split('T')[0],
-        };
+        });
 
-        return [...prev, newFolder];
-      });
+        setFolders(prev => [...prev, createdFolder]);
+      }
+
+      closeModal();
+    } catch (err: unknown) {
+      console.warn(err);
     }
-    closeModal();
   };
 
   // 폴더 삭제 (하위 폴더 포함 재귀 삭제)
@@ -98,13 +111,17 @@ const FolderPage: React.FC = () => {
 
   const breadcrumb = getBreadcrumb();
 
+  // 초기 폴더 목록 로드
+  useEffect(() => {
+    void loadFolder();
+  }, []);
+
   return (
     <>
       <Navbar />
 
       <div className="container-fluid">
         <div className="row" style={{ minHeight: 'calc(100vh - 56px)' }}>
-
           {/* ── 사이드바 ── */}
           <aside className="col-md-3 col-xl-2 border-end bg-light py-3">
             <div className="d-flex justify-content-between align-items-center mb-2 px-1">
@@ -117,16 +134,11 @@ const FolderPage: React.FC = () => {
                 +
               </button>
             </div>
-            <FolderTree
-              folders={folders}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-            />
+            <FolderTree folders={folders} selectedId={selectedId} onSelect={setSelectedId} />
           </aside>
 
           {/* ── 메인 콘텐츠 ── */}
           <main className="col-md-9 col-xl-10 py-3 px-4">
-
             {/* 브레드크럼 */}
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb">
@@ -143,7 +155,9 @@ const FolderPage: React.FC = () => {
                   const isLast = i === breadcrumb.length - 1;
                   return (
                     <li key={f.id} className={`breadcrumb-item ${isLast ? 'active' : ''}`}>
-                      {isLast ? f.name : (
+                      {isLast ? (
+                        f.name
+                      ) : (
                         <span
                           role="button"
                           className="text-primary text-decoration-underline"
@@ -161,9 +175,7 @@ const FolderPage: React.FC = () => {
             {/* 툴바 */}
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5 className="mb-0">
-                {breadcrumb.length > 0
-                  ? breadcrumb[breadcrumb.length - 1].name
-                  : '전체 폴더'}
+                {breadcrumb.length > 0 ? breadcrumb[breadcrumb.length - 1].name : '전체 폴더'}
                 <span className="ms-2 badge bg-secondary fw-normal" style={{ fontSize: '0.75rem' }}>
                   {currentFolders.length}개
                 </span>
@@ -205,7 +217,10 @@ const FolderPage: React.FC = () => {
                         <button
                           className="btn btn-sm btn-outline-secondary"
                           title="이름 변경"
-                          onClick={e => { e.stopPropagation(); openEditModal(folder); }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            openEditModal(folder);
+                          }}
                         >
                           ✏️
                         </button>
@@ -213,7 +228,10 @@ const FolderPage: React.FC = () => {
                         <button
                           className="btn btn-sm btn-outline-danger"
                           title="삭제"
-                          onClick={e => { e.stopPropagation(); handleDelete(folder.id); }}
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleDelete(folder.id);
+                          }}
                         >
                           🗑️
                         </button>
@@ -241,9 +259,7 @@ const FolderPage: React.FC = () => {
           >
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">
-                  {editTarget ? '폴더 이름 변경' : '새 폴더 만들기'}
-                </h5>
+                <h5 className="modal-title">{editTarget ? '폴더 이름 변경' : '새 폴더 만들기'}</h5>
                 <button className="btn-close" onClick={closeModal} />
               </div>
               <div className="modal-body">
@@ -258,7 +274,9 @@ const FolderPage: React.FC = () => {
                 />
               </div>
               <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={closeModal}>취소</button>
+                <button className="btn btn-secondary" onClick={closeModal}>
+                  취소
+                </button>
                 <button
                   className="btn btn-primary"
                   onClick={handleSave}
