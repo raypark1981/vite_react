@@ -27,14 +27,19 @@ const FolderTreeItem: React.FC<{
       <div
         className={`d-flex align-items-center py-1 rounded ${isSelected ? 'bg-primary text-white' : 'text-dark'}`}
         style={{ paddingLeft: `${depth * 14 + 8}px`, cursor: 'pointer' }}
-        onClick={() => onSelect(folder.id)}
+        onClick={() => {
+          onSelect(folder.id);
+        }}
       >
         {/* 하위 폴더가 있으면 펼침 버튼 */}
         {hasChildren ? (
           <span
             className="me-1"
             style={{ fontSize: '0.65rem', width: '12px' }}
-            onClick={e => { e.stopPropagation(); setIsOpen(prev => !prev); }}
+            onClick={e => {
+              e.stopPropagation();
+              setIsOpen(prev => !prev);
+            }}
           >
             {isOpen ? '▼' : '▶'}
           </span>
@@ -46,16 +51,17 @@ const FolderTreeItem: React.FC<{
       </div>
 
       {/* 하위 폴더 재귀 렌더링 */}
-      {isOpen && children.map(child => (
-        <FolderTreeItem
-          key={child.id}
-          folder={child}
-          folders={folders}
-          depth={depth + 1}
-          selectedId={selectedId}
-          onSelect={onSelect}
-        />
-      ))}
+      {isOpen &&
+        children.map(child => (
+          <FolderTreeItem
+            key={child.id}
+            folder={child}
+            folders={folders}
+            depth={depth + 1}
+            selectedId={selectedId}
+            onSelect={onSelect}
+          />
+        ))}
     </div>
   );
 };
@@ -76,7 +82,7 @@ const FolderTree: React.FC<Props> = ({ folders, selectedId, onSelect }) => {
         <span className="small fw-semibold">전체</span>
       </div>
 
-      {rootFolders.map((folder) => (
+      {rootFolders.map(folder => (
         <FolderTreeItem
           key={folder.id}
           folder={folder}

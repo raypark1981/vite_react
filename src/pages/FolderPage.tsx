@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Folder } from '@/types/folder';
-import { getFolders, createFolder } from '@/api/folderApi';
+import { getFolders, createFolder, updateFolder, deleteFolder } from '@/api/folderApi';
 import FolderTree from '@/components/folder/FolderTree';
 import Navbar from '@/components/layout/Navbar';
 
@@ -13,10 +13,15 @@ import Navbar from '@/components/layout/Navbar';
 // ];
 
 const FolderPage: React.FC = () => {
+  // 폴더 목록 및 상태 관리
   const [folders, setFolders] = useState<Folder[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null); // 현재 선택된 폴더 id
+  // 현재 선택된 폴더 id
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // 모달 상태 및 편집 대상 폴더
   const [showModal, setShowModal] = useState(false);
-  const [editTarget, setEditTarget] = useState<Folder | null>(null); // null = 새 폴더
+  // 편집 대상 폴더 (null이면 새 폴더 생성)
+  const [editTarget, setEditTarget] = useState<Folder | null>(null);
+  // 폴더 이름 입력 상태
   const [inputName, setInputName] = useState('');
 
   const loadFolder = async (): Promise<void> => {
@@ -61,7 +66,8 @@ const FolderPage: React.FC = () => {
 
     try {
       if (editTarget) {
-        // 이름 변경
+        if (!editTarget.id) return;
+        await updateFolder(editTarget.id, editTarget);
         setFolders(prev =>
           prev.map(f => (f.id === editTarget.id ? { ...f, name: inputName.trim() } : f)),
         );
@@ -82,7 +88,13 @@ const FolderPage: React.FC = () => {
   };
 
   // 폴더 삭제 (하위 폴더 포함 재귀 삭제)
-  const handleDelete = (targetId: string) => {
+  const handleDelete = async (targetId: string) => {
+    if (targetId === undefined) return;
+    if (!confirm('폴더를 삭제하시겠습니까? 하위 폴더도 모두 삭제됩니다.')) {
+      return;
+    }
+    await deleteFolder(targetId);
+
     const collectIds = (id: string): string[] => {
       const children = folders.filter(f => f.parentId === id).map(f => f.id);
       return [id, ...children.flatMap(collectIds)];
