@@ -1,5 +1,6 @@
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import FolderPage from '@/pages/FolderPage';
+import NoteEditorPage from '@/pages/NoteEditorPage';
 
 // 라우팅 설정
 // - /        → 폴더 관리 페이지 (메인)
@@ -7,7 +8,9 @@ import FolderPage from '@/pages/FolderPage';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<FolderPage />} />
+      <Route path="/" element={<Navigate to="/folders" replace />} />
+      <Route path="/folders" element={<FolderPage />} />
+      <Route path="/notes/new" element={<NoteEditorPage />} />
     </Routes>
   );
 }
