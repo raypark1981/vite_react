@@ -1,10 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import { getFolders } from '@/api/folderApi';
 import type { Folder } from '@/types/folder';
+import type { StudyNote } from '@/types/note';
+import TextInput from '@/components/common/FormInput';
 
-const NoteEditorPage: React.FC = () => {
+interface NoteEditorPageProps {
+  id?: string;
+  note?: StudyNote;
+}
+
+// const NoteEditorPage: React.FC<NoteEditorPageProps> = ({ id, note: _note }) => {
+const NoteEditorPage = ({ id, note: _note }: NoteEditorPageProps) => {
   const [folders, setFolders] = useState<Folder[]>([]);
+
+  // * Partial<StudyNote> 적용 후:
+  // * {
+  // *   id?: string;       // 선택
+  // *   folderId?: string; // 선택
+  // *   title?: string;    // 선택
+  // *   code?: string;     // 선택
+  // *   ...
+  // * }
+  const [note, setNote] = useState<Partial<StudyNote>>(_note ?? {});
+
+  const handleChange = (key: keyof StudyNote, value: unknown) => {
+    setNote(prev => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
   const loadFolderSelect = () => {
     try {
       getFolders().then(data => setFolders(data));
@@ -27,12 +52,13 @@ const NoteEditorPage: React.FC = () => {
           <label htmlFor="noteTitle" className="form-label fw-semibold">
             제목 <span className="text-danger">*</span>
           </label>
-          <input
-            type="text"
-            id="noteTitle"
-            className="form-control"
-            placeholder="노트 제목을 입력하세요"
-          />
+          <TextInput
+            id={'noteTitle'}
+            allowEmpty={false}
+            title={'제목'}
+            placeHolder={'노트 제목을 입력하세요.'}
+            onChange={value => handleChange('title', value)}
+          ></TextInput>
         </div>
 
         <div className="mb-3">
