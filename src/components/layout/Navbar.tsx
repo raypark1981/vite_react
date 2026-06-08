@@ -29,6 +29,16 @@ const Navbar: React.FC = () => {
               글등록
             </NavLink>
           </li>
+          <li className="nav-item">
+            <NavLink
+              to="/notes/list"
+              className={({ isActive }) =>
+                `nav-link px-2 ${isActive ? 'active fw-semibold text-white' : ''}`
+              }
+            >
+              글목록{' '}
+            </NavLink>
+          </li>
         </ul>
       </div>
     </nav>
