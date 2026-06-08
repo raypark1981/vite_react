@@ -21,9 +21,8 @@ export interface CreateStudyNoteInput {
 }
 
 export interface UpdateStudyNoteInput {
-  id: string;
-  folderId?: string;
-  title?: string;
+  folderId: string;
+  title: string;
   code?: string;
   description?: string;
   tags?: string[];
