@@ -7,10 +7,14 @@ import { getFolders } from '@/api/folderApi';
 import { useNavigate } from 'react-router-dom';
 
 const NoteListPage = () => {
-  // ! 기능 구현 시 이 값들을 useState + API로 교체하세요
   const [folders, setFolders] = useState<Folder[]>([]);
   const [notes, setNotes] = useState<StudyNote[]>([]);
-  const selectedFolderId = folders.at(0)?.id;
+  // * useState 최초 1회만 실행이므로, Api로 채워진 값은 undefined가 되고, 실제 setFolder로 채워 져서 다시 리렌더링이 되어도 ,
+  // * 초기 값은 변하지 않는다. 그래서 useEffect에 데이터 가져올때, 초기값을 셋팅하는 setSelectedFolerId(id)를 줌
+  // // 잘못된 로직 const [selectedFolderId, setSelectedFolerId] = useState(folders.at(0)?.id);
+  const [selectedFolderId, setSelectedFolerId] = useState<string | undefined>(undefined);
+  console.log('selectedFolderId', selectedFolderId);
+
   const [searchKeyword, setSearchKeyword] = useState('');
   const navigate = useNavigate();
 
@@ -39,6 +43,7 @@ const NoteListPage = () => {
       .then(data => {
         setFolders(data);
         const id = data.at(0)?.id;
+        setSelectedFolerId(id);
         console.log('getFolders', id);
         return id; // 첫번째 폴더  id
       })
@@ -55,7 +60,7 @@ const NoteListPage = () => {
         console.warn('폴더 가져오기 오류');
       });
   }, []);
-  console.log('loading');
+  console.log('loading', selectedFolderId);
   return (
     <>
       <Navbar />
@@ -65,18 +70,23 @@ const NoteListPage = () => {
           <aside style={{ width: '200px', flexShrink: 0 }}>
             <h6 className="fw-semibold mb-2 text-secondary">폴더</h6>
             <ul className="list-group">
-              {folders.map(folder => (
-                <li
-                  key={folder.id}
-                  className={`list-group-item list-group-item-action py-2 px-3 ${
-                    folder.id === selectedFolderId ? 'active' : ''
-                  }`}
-                  style={{ cursor: 'pointer', fontSize: '0.9rem' }}
-                  // todo: onClick → 폴더 선택 상태 변경
-                >
-                  {folder.name}
-                </li>
-              ))}
+              {folders.map(
+                folder => (
+                  console.log(selectedFolderId),
+                  (
+                    <li
+                      key={folder.id}
+                      className={`list-group-item list-group-item-action py-2 px-3 ${
+                        folder.id === selectedFolderId ? 'active' : ''
+                      }`}
+                      style={{ cursor: 'pointer', fontSize: '0.9rem' }}
+                      onClick={() => setSelectedFolerId(folder.id)}
+                    >
+                      {folder.name}
+                    </li>
+                  )
+                ),
+              )}
             </ul>
           </aside>
 
