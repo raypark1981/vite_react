@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface TextInputProps {
   id: string;
@@ -36,6 +36,10 @@ const TextInput = ({
     // ! onChange 콜백이 존재하는 경우에만 호출 (옵셔널 체이닝)
     onChange?.(e.currentTarget.value);
   };
+
+  useEffect(() => {
+    setText(innerText);
+  }, [innerText]);
 
   return (
     <div>

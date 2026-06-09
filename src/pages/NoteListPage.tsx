@@ -13,8 +13,7 @@ const NoteListPage = () => {
   // * 초기 값은 변하지 않는다. 그래서 useEffect에 데이터 가져올때, 초기값을 셋팅하는 setSelectedFolerId(id)를 줌
   // // 잘못된 로직 const [selectedFolderId, setSelectedFolerId] = useState(folders.at(0)?.id);
   const [selectedFolderId, setSelectedFolerId] = useState<string | undefined>(undefined);
-  console.log('selectedFolderId', selectedFolderId);
-
+  // console.log('selectedFolderId', selectedFolderId);
   const [searchKeyword, setSearchKeyword] = useState('');
   const navigate = useNavigate();
 
@@ -37,30 +36,30 @@ const NoteListPage = () => {
   // * 동기/마이크로태스크(.then() 단순 반환) → 이벤트 루프 안 비워짐 → 리렌더 실행 안 됨
   // * 비동기 네트워크 요청(HTTP) → 이벤트 루프 비워짐 → 그 틈에 예약된 리렌더 실행 → HTTP 응답 오면 다시 .then() 재개 → 또 리렌더 예약 → 실행
   useEffect(() => {
-    console.log(3);
+    // console.log(3);
 
     getFolders()
       .then(data => {
         setFolders(data);
         const id = data.at(0)?.id;
         setSelectedFolerId(id);
-        console.log('getFolders', id);
+        // console.log('getFolders', id);
         return id; // 첫번째 폴더  id
       })
       .then(firstFolderId => {
-        console.log('firstFolderId', firstFolderId);
+        // console.log('firstFolderId', firstFolderId);
         if (!firstFolderId) return;
         return getStudyNotes(firstFolderId);
       })
       .then(data => {
-        console.log('getStudyNotes', data);
+        // console.log('getStudyNotes', data);
         if (data) setNotes(data);
       })
       .catch(() => {
         console.warn('폴더 가져오기 오류');
       });
   }, []);
-  console.log('loading', selectedFolderId);
+  // console.log('loading', selectedFolderId);
   return (
     <>
       <Navbar />
@@ -70,23 +69,19 @@ const NoteListPage = () => {
           <aside style={{ width: '200px', flexShrink: 0 }}>
             <h6 className="fw-semibold mb-2 text-secondary">폴더</h6>
             <ul className="list-group">
-              {folders.map(
-                folder => (
-                  console.log(selectedFolderId),
-                  (
-                    <li
-                      key={folder.id}
-                      className={`list-group-item list-group-item-action py-2 px-3 ${
-                        folder.id === selectedFolderId ? 'active' : ''
-                      }`}
-                      style={{ cursor: 'pointer', fontSize: '0.9rem' }}
-                      onClick={() => setSelectedFolerId(folder.id)}
-                    >
-                      {folder.name}
-                    </li>
-                  )
-                ),
-              )}
+              {folders.map(folder => (
+                // console.log(selectedFolderId),
+                <li
+                  key={folder.id}
+                  className={`list-group-item list-group-item-action py-2 px-3 ${
+                    folder.id === selectedFolderId ? 'active' : ''
+                  }`}
+                  style={{ cursor: 'pointer', fontSize: '0.9rem' }}
+                  onClick={() => setSelectedFolerId(folder.id)}
+                >
+                  {folder.name}
+                </li>
+              ))}
             </ul>
           </aside>
 

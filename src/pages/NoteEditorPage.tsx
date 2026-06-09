@@ -1,7 +1,7 @@
 import { useEffect, useState, type KeyboardEvent } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import { getFolders } from '@/api/folderApi';
-import { createNote, updateNote } from '@/api/noteApi';
+import { createNote, getStudyNote, updateNote } from '@/api/noteApi';
 import type { Folder } from '@/types/folder';
 import type { CreateStudyNoteInput, StudyNote, UpdateStudyNoteInput } from '@/types/note';
 import TextInput from '@/components/common/FormInput';
@@ -11,8 +11,6 @@ import { useParams, useLocation } from 'react-router-dom';
 const NoteEditorPage = () => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const { id } = useParams();
-  const { state } = useLocation();
-  const _note = state?.note as StudyNote | undefined;
 
   // * Partial<StudyNote> 적용 후: Optionsl 프로퍼티로 변환되어, 모든 필드가 선택적으로 됨
   // * {
@@ -22,8 +20,8 @@ const NoteEditorPage = () => {
   // *   code?: string;     // 선택
   // *   ...
   // * }
-  const [note, setNote] = useState<Partial<StudyNote>>(_note ?? {});
-  const [tagInput, setTagInput] = useState<string>((_note?.tags ?? []).join(','));
+  const [note, setNote] = useState<Partial<StudyNote>>({});
+  const [tagInput, setTagInput] = useState<string>('');
 
   // 스키마 정보 그대로 key value 형태로 업데이트하는 범용 핸들러
   const handleChange = <K extends keyof StudyNote>(key: K, value: StudyNote[K]) => {
@@ -94,6 +92,8 @@ const NoteEditorPage = () => {
       }
 
       await updateNote(id, input);
+      console.log(input);
+      console.log(note);
       return;
     } else {
       const input = toCreateInput(note);
@@ -118,7 +118,14 @@ const NoteEditorPage = () => {
 
   useEffect(() => {
     loadFolderSelect();
-  }, []);
+    if (id) {
+      getStudyNote(id).then(data => {
+        console.log(111);
+        setNote(data);
+        setTagInput(data.tags.join(','));
+      });
+    }
+  }, [id]);
 
   console.log(note);
   return (
@@ -148,13 +155,14 @@ const NoteEditorPage = () => {
           <select
             id="noteFolder"
             className="form-select"
+            value={note.folderId ?? ''}
             onChange={e => handleChange('folderId', e.target.value)}
           >
             <option value="">전체</option>
             {folders &&
               folders.map(folder => {
                 return (
-                  <option key={folder.id} value={folder.id} selected={folder.id === note.folderId}>
+                  <option key={folder.id} value={folder.id}>
                     {folder.name}
                   </option>
                 );
