@@ -6,15 +6,13 @@ import type { Folder } from '@/types/folder';
 import type { CreateStudyNoteInput, StudyNote, UpdateStudyNoteInput } from '@/types/note';
 import TextInput from '@/components/common/FormInput';
 import FormTextarea from '@/components/common/FormTextarea';
-
-interface NoteEditorPageProps {
-  id?: string;
-  note?: StudyNote;
-}
-
+import { useParams, useLocation } from 'react-router-dom';
 // const NoteEditorPage: React.FC<NoteEditorPageProps> = ({ id, note: _note }) => {
-const NoteEditorPage = ({ id, note: _note }: NoteEditorPageProps) => {
+const NoteEditorPage = () => {
   const [folders, setFolders] = useState<Folder[]>([]);
+  const { id } = useParams();
+  const { state } = useLocation();
+  const _note = state?.note as StudyNote | undefined;
 
   // * Partial<StudyNote> 적용 후: Optionsl 프로퍼티로 변환되어, 모든 필드가 선택적으로 됨
   // * {
@@ -122,6 +120,7 @@ const NoteEditorPage = ({ id, note: _note }: NoteEditorPageProps) => {
     loadFolderSelect();
   }, []);
 
+  console.log(note);
   return (
     <>
       <Navbar />
@@ -138,6 +137,7 @@ const NoteEditorPage = ({ id, note: _note }: NoteEditorPageProps) => {
             title={'제목'}
             placeHolder={'노트 제목을 입력하세요.'}
             onChange={value => handleChange('title', value)}
+            innerText={note.title || ''}
           ></TextInput>
         </div>
 
@@ -154,7 +154,7 @@ const NoteEditorPage = ({ id, note: _note }: NoteEditorPageProps) => {
             {folders &&
               folders.map(folder => {
                 return (
-                  <option key={folder.id} value={folder.id}>
+                  <option key={folder.id} value={folder.id} selected={folder.id === note.folderId}>
                     {folder.name}
                   </option>
                 );
@@ -171,6 +171,7 @@ const NoteEditorPage = ({ id, note: _note }: NoteEditorPageProps) => {
             placeholder={'코드를 입력하세요'}
             rows={8}
             onChange={value => handleChange('code', value)}
+            innerText={note.code}
           />
         </div>
 
@@ -182,6 +183,7 @@ const NoteEditorPage = ({ id, note: _note }: NoteEditorPageProps) => {
             id={'noteDescription'}
             placeholder={'코드에 대한 설명을 입력하세요'}
             onChange={value => handleChange('description', value)}
+            innerText={note.description}
           />
         </div>
 
