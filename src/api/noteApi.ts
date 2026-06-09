@@ -2,7 +2,7 @@ import { request } from '@/api/client';
 import type { CreateStudyNoteInput, StudyNote, UpdateStudyNoteInput } from '@/types/note';
 
 const NOTES_PATH = '/notes';
-export const getStudyNotes = async (foldid: string): Promise<StudyNote[]> => {
+export const getStudyNotes = async (): Promise<StudyNote[]> => {
   return request<StudyNote[]>(`${NOTES_PATH}`);
 };
 

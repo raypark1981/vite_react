@@ -13,7 +13,7 @@ function App() {
       <Route path="/folders" element={<FolderPage />} />
       <Route path="/notes/new" element={<NoteEditorPage />} />
       <Route path="/notes/:id/edit" element={<NoteEditorPage />} />
-      <Route path="/notes/list" element={<NoteListPage />} />
+      <Route path="/notes/list/:folderId?" element={<NoteListPage />} />
     </Routes>
   );
 }

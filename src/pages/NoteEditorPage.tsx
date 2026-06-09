@@ -6,11 +6,13 @@ import type { Folder } from '@/types/folder';
 import type { CreateStudyNoteInput, StudyNote, UpdateStudyNoteInput } from '@/types/note';
 import TextInput from '@/components/common/FormInput';
 import FormTextarea from '@/components/common/FormTextarea';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 // const NoteEditorPage: React.FC<NoteEditorPageProps> = ({ id, note: _note }) => {
 const NoteEditorPage = () => {
   const [folders, setFolders] = useState<Folder[]>([]);
   const { id } = useParams();
+
+  const navigate = useNavigate();
 
   // * Partial<StudyNote> 적용 후: Optionsl 프로퍼티로 변환되어, 모든 필드가 선택적으로 됨
   // * {
@@ -92,8 +94,6 @@ const NoteEditorPage = () => {
       }
 
       await updateNote(id, input);
-      console.log(input);
-      console.log(note);
       return;
     } else {
       const input = toCreateInput(note);
@@ -103,7 +103,7 @@ const NoteEditorPage = () => {
       }
       const created = await createNote(input);
       if (created.id) {
-        // 목록으로 이동
+        navigate(`/notes/list/${created.folderId}`);
       }
     }
   };
