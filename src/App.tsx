@@ -12,6 +12,7 @@ function App() {
       <Route path="/" element={<Navigate to="/folders" replace />} />
       <Route path="/folders" element={<FolderPage />} />
       <Route path="/notes/new" element={<NoteEditorPage />} />
+      <Route path="/notes/:id/edit" element={<NoteEditorPage />} />
       <Route path="/notes/list" element={<NoteListPage />} />
     </Routes>
   );
