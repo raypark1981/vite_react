@@ -2,10 +2,11 @@ interface FormTextareaProps {
   id: string;
   rows?: number;
   placeholder?: string;
+  innerText?: string;
   onChange: (value: string) => void;
 }
 
-const FormTextarea = ({ id, rows = 4, placeholder, onChange }: FormTextareaProps) => {
+const FormTextarea = ({ id, rows = 4, placeholder, innerText, onChange }: FormTextareaProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
   };
@@ -17,6 +18,7 @@ const FormTextarea = ({ id, rows = 4, placeholder, onChange }: FormTextareaProps
       rows={rows}
       placeholder={placeholder}
       onChange={handleChange}
+      value={innerText ?? ''}
     />
   );
 };

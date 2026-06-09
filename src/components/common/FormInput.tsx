@@ -7,6 +7,7 @@ interface TextInputProps {
   className?: string;
   onBlurEmptyMessage?: string;
   allowEmpty?: boolean;
+  innerText: string;
   onChange?: (value: string) => void;
 }
 const TextInput = ({
@@ -16,10 +17,11 @@ const TextInput = ({
   placeHolder,
   onBlurEmptyMessage,
   allowEmpty = true,
+  innerText,
   onChange,
 }: TextInputProps) => {
   const [errorMessage, setErrorMessage] = useState('');
-  const [text, setText] = useState('');
+  const [text, setText] = useState(innerText);
   const handleOnBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     if (allowEmpty) return;
     if (!e.currentTarget.value) {
