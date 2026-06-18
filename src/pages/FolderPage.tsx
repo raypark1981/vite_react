@@ -3,6 +3,8 @@ import type { Folder } from '@/types/folder';
 import { getFolders, createFolder, updateFolder, deleteFolder } from '@/api/folderApi';
 import FolderTree from '@/components/folder/FolderTree';
 import Navbar from '@/components/layout/Navbar';
+import LoadingBar from '@/components/common/LoadingBar';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 
 // 임시 초기 데이터 (추후 localStorage 또는 API로 교체)
 // const INITIAL_FOLDERS: Folder[] = [
@@ -13,8 +15,14 @@ import Navbar from '@/components/layout/Navbar';
 // ];
 
 const FolderPage: React.FC = () => {
-  // 폴더 목록 및 상태 관리
-  const [folders, setFolders] = useState<Folder[]>([]);
+  // 폴더 목록 및 상태 관리(react query 후 안씀)
+  // const [folders, setFolders] = useState<Folder[]>([]);
+  const queryClient = useQueryClient();
+  const {
+    data: folders = [],
+    isLoading,
+    isError,
+  } = useQuery({ queryKey: ['folders'], queryFn: getFolders });
   // 현재 선택된 폴더 id
   const [selectedId, setSelectedId] = useState<string | null>(null);
   // 모달 상태 및 편집 대상 폴더
@@ -24,6 +32,7 @@ const FolderPage: React.FC = () => {
   // 폴더 이름 입력 상태
   const [inputName, setInputName] = useState('');
 
+  // react query 생성 후 안씀
   const loadFolder = async (): Promise<void> => {
     // lint 경고 뜸 그래서 아래와 같이 변경
     //   const loadFolder  = async () => {
@@ -34,12 +43,13 @@ const FolderPage: React.FC = () => {
     //     console.warn(err);
     //   }
     // };
-
-    getFolders()
-      .then(setFolders)
-      .catch((err: unknown) => {
-        console.warn(err);
-      });
+    //
+    // react query 생성 후 안씀
+    // getFolders()
+    //   .then(setFolders)
+    //   .catch((err: unknown) => {
+    //     console.warn(err);
+    //   });
   };
 
   // 현재 위치의 직속 자식 폴더 목록
@@ -67,18 +77,20 @@ const FolderPage: React.FC = () => {
     try {
       if (editTarget) {
         if (!editTarget.id) return;
-        await updateFolder(editTarget.id, editTarget);
-        setFolders(prev =>
-          prev.map(f => (f.id === editTarget.id ? { ...f, name: inputName.trim() } : f)),
-        );
+        await updateFolder(editTarget.id, { ...editTarget, name: inputName });
+        // setFolders(prev =>
+        //   prev.map(f => (f.id === editTarget.id ? { ...f, name: inputName.trim() } : f)),
+        // );
+        await queryClient.invalidateQueries({ queryKey: ['folders'] });
       } else {
         // 새 폴더 생성: 서버 응답을 상태에 반영
-        const createdFolder = await createFolder({
+        await createFolder({
           name: inputName.trim(),
           parentId: selectedId,
         });
 
-        setFolders(prev => [...prev, createdFolder]);
+        // setFolders(prev => [...prev, createdFolder]);
+        await queryClient.invalidateQueries({ queryKey: ['folders'] });
       }
 
       closeModal();
@@ -95,12 +107,14 @@ const FolderPage: React.FC = () => {
     }
     await deleteFolder(targetId);
 
-    const collectIds = (id: string): string[] => {
-      const children = folders.filter(f => f.parentId === id).map(f => f.id);
-      return [id, ...children.flatMap(collectIds)];
-    };
-    const toDelete = new Set(collectIds(targetId));
-    setFolders(prev => prev.filter(f => !toDelete.has(f.id)));
+    // react query 생기고 다 주석 처리 됨
+    // const collectIds = (id: string): string[] => {
+    //   const children = folders.filter(f => f.parentId === id).map(f => f.id);
+    //   return [id, ...children.flatMap(collectIds)];
+    // };
+    // const toDelete = new Set(collectIds(targetId));
+    // setFolders(prev => prev.filter(f => !toDelete.has(f.id)));
+    await queryClient.invalidateQueries({ queryKey: ['folders'] });
   };
 
   const openCreateModal = () => {
@@ -131,7 +145,7 @@ const FolderPage: React.FC = () => {
   return (
     <>
       <Navbar />
-
+      {isLoading && <LoadingBar />}
       <div className="container-fluid">
         <div className="row" style={{ minHeight: 'calc(100vh - 56px)' }}>
           {/* ── 사이드바 ── */}

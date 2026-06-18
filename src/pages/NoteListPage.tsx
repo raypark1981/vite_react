@@ -1,15 +1,37 @@
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
-import type { Folder } from '@/types/folder';
+// import type { Folder } from '@/types/folder';
 import type { StudyNote, UpdateStudyNoteInput } from '@/types/note';
 import { getStudyNotes } from '@/api/noteApi';
 import { getFolders } from '@/api/folderApi';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import LoadingBar from '@/components/common/LoadingBar';
 
 const NoteListPage = () => {
+  const {
+    data: folders = [],
+    isSuccess: folderLoaded,
+    isLoading: isLoadingFolders,
+    isError: isErrorFolders,
+  } = useQuery({
+    queryKey: ['folders'],
+    queryFn: getFolders,
+  });
+
+  const {
+    data: notes = [],
+    isLoading: isLoadingNotes,
+    isError: isErrorNotes,
+  } = useQuery({
+    queryKey: ['notes'],
+    queryFn: getStudyNotes,
+    enabled: folderLoaded,
+  });
+
   const { folderId } = useParams();
-  const [folders, setFolders] = useState<Folder[]>([]);
-  const [notes, setNotes] = useState<StudyNote[]>([]);
+  // const [folders, setFolders] = useState<Folder[]>([]);
+  // const [notes, setNotes] = useState<StudyNote[]>([]);
   // * useState 최초 1회만 실행이므로, Api로 채워진 값은 undefined가 되고, 실제 setFolder로 채워 져서 다시 리렌더링이 되어도 ,
   // * 초기 값은 변하지 않는다. 그래서 useEffect에 데이터 가져올때, 초기값을 셋팅하는 setSelectedFolerId(id)를 줌
   // // 잘못된 로직 const [selectedFolderId, setSelectedFolerId] = useState(folders.at(0)?.id);
@@ -35,27 +57,29 @@ const NoteListPage = () => {
   // * 동기/마이크로태스크(.then() 단순 반환) → 이벤트 루프 안 비워짐 → 리렌더 실행 안 됨
   // * 비동기 네트워크 요청(HTTP) → 이벤트 루프 비워짐 → 그 틈에 예약된 리렌더 실행 → HTTP 응답 오면 다시 .then() 재개 → 또 리렌더 예약 → 실행
   useEffect(() => {
-    getFolders()
-      .then(data => {
-        setFolders(data);
-        // const id = data.at(0)?.id;
-        // setSelectedFolerId(id);
-        // return id; // 첫번째 폴더  id
-      })
-      .then(() => {
-        // if (!firstFolderId) return;
-        return getStudyNotes();
-      })
-      .then(data => {
-        if (data) setNotes(data);
-      })
-      .catch(() => {
-        console.warn('폴더 가져오기 오류');
-      });
+    // getFolders()
+    //   .then(data => {
+    //     setFolders(data);
+    //     // const id = data.at(0)?.id;
+    //     // setSelectedFolerId(id);
+    //     // return id; // 첫번째 폴더  id
+    //   })
+    //   .then(() => {
+    //     // if (!firstFolderId) return;
+    //     return getStudyNotes();
+    //   })
+    //   .then(data => {
+    //     if (data) setNotes(data);
+    //   })
+    //   .catch(() => {
+    //     console.warn('폴더 가져오기 오류');
+    //   });
   }, []);
   return (
     <>
       <Navbar />
+      {isLoadingFolders && <LoadingBar message="폴더 불러오는 중..."></LoadingBar>}
+      {isLoadingNotes && <LoadingBar message="노트 불러오는 중..." />}
       <main className="container py-4" style={{ maxWidth: '960px' }}>
         <div className="d-flex gap-3">
           {/* 왼쪽: 폴더 목록 */}

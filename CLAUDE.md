@@ -15,6 +15,8 @@
 - Do not modify files outside the requested scope.
 - Before making large changes, show the work plan first.
 - Always ask for confirmation before deleting files, moving many files, or installing packages.
+- Do not point out declared but unused variables, imports, or functions as errors or issues.
+- Do not suggest removing commented-out code or empty functions. They are kept intentionally for learning purposes.
 
 ## Git Rules
 
