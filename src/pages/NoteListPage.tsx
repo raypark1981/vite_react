@@ -6,7 +6,6 @@ import { getStudyNotes } from '@/api/noteApi';
 import { getFolders } from '@/api/folderApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import LoadingBar from '@/components/common/LoadingBar';
 
 const NoteListPage = () => {
   const {
@@ -17,6 +16,7 @@ const NoteListPage = () => {
   } = useQuery({
     queryKey: ['folders'],
     queryFn: getFolders,
+    meta: { loadingMessage: '폴더 불러오는 중...' },
   });
 
   const {
@@ -27,6 +27,7 @@ const NoteListPage = () => {
     queryKey: ['notes'],
     queryFn: getStudyNotes,
     enabled: folderLoaded,
+    meta: { loadingMessage: 'Notes 불러오는 중...' },
   });
 
   const { folderId } = useParams();
@@ -78,8 +79,6 @@ const NoteListPage = () => {
   return (
     <>
       <Navbar />
-      {isLoadingFolders && <LoadingBar message="폴더 불러오는 중..."></LoadingBar>}
-      {isLoadingNotes && <LoadingBar message="노트 불러오는 중..." />}
       <main className="container py-4" style={{ maxWidth: '960px' }}>
         <div className="d-flex gap-3">
           {/* 왼쪽: 폴더 목록 */}

@@ -3,7 +3,6 @@ import type { Folder } from '@/types/folder';
 import { getFolders, createFolder, updateFolder, deleteFolder } from '@/api/folderApi';
 import FolderTree from '@/components/folder/FolderTree';
 import Navbar from '@/components/layout/Navbar';
-import LoadingBar from '@/components/common/LoadingBar';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 
 // 임시 초기 데이터 (추후 localStorage 또는 API로 교체)
@@ -22,7 +21,11 @@ const FolderPage: React.FC = () => {
     data: folders = [],
     isLoading,
     isError,
-  } = useQuery({ queryKey: ['folders'], queryFn: getFolders });
+  } = useQuery({
+    queryKey: ['folders'],
+    queryFn: getFolders,
+    meta: { loadingMessage: '폴더 불러오는 중...' },
+  });
   // 현재 선택된 폴더 id
   const [selectedId, setSelectedId] = useState<string | null>(null);
   // 모달 상태 및 편집 대상 폴더
@@ -145,7 +148,6 @@ const FolderPage: React.FC = () => {
   return (
     <>
       <Navbar />
-      {isLoading && <LoadingBar />}
       <div className="container-fluid">
         <div className="row" style={{ minHeight: 'calc(100vh - 56px)' }}>
           {/* ── 사이드바 ── */}
