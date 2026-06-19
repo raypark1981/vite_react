@@ -4,6 +4,7 @@ import { getFolders, createFolder, updateFolder, deleteFolder } from '@/api/fold
 import FolderTree from '@/components/folder/FolderTree';
 import Navbar from '@/components/layout/Navbar';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useToastStore } from '@/stores/useToastStore';
 
 // 임시 초기 데이터 (추후 localStorage 또는 API로 교체)
 // const INITIAL_FOLDERS: Folder[] = [
@@ -17,15 +18,14 @@ const FolderPage: React.FC = () => {
   // 폴더 목록 및 상태 관리(react query 후 안씀)
   // const [folders, setFolders] = useState<Folder[]>([]);
   const queryClient = useQueryClient();
-  const {
-    data: folders = [],
-    isLoading,
-    isError,
-  } = useQuery({
+  const showToast = useToastStore(state => state.showToast);
+
+  const { data: folders = [], isError } = useQuery({
     queryKey: ['folders'],
     queryFn: getFolders,
     meta: { loadingMessage: '폴더 불러오는 중...' },
   });
+
   // 현재 선택된 폴더 id
   const [selectedId, setSelectedId] = useState<string | null>(null);
   // 모달 상태 및 편집 대상 폴더
@@ -145,6 +145,9 @@ const FolderPage: React.FC = () => {
     void loadFolder();
   }, []);
 
+  useEffect(() => {
+    if (isError) showToast('오류', 'error');
+  }, [isError, showToast]);
   return (
     <>
       <Navbar />

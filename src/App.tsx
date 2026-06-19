@@ -3,6 +3,7 @@ import FolderPage from '@/pages/FolderPage';
 import NoteEditorPage from '@/pages/NoteEditorPage';
 import NoteListPage from '@/pages/NoteListPage';
 import GlobalLoadingOverlay from '@/components/common/GlobalLoadingOverlay';
+import Toast from '@/components/common/Toast';
 
 // 라우팅 설정
 // - /        → 폴더 관리 페이지 (메인)
@@ -10,6 +11,7 @@ import GlobalLoadingOverlay from '@/components/common/GlobalLoadingOverlay';
 function App() {
   return (
     <>
+      <Toast />
       <GlobalLoadingOverlay />
       <Routes>
         <Route path="/" element={<Navigate to="/folders" replace />} />
@@ -18,6 +20,7 @@ function App() {
         <Route path="/notes/:id/edit" element={<NoteEditorPage />} />
         <Route path="/notes/list/:folderId?" element={<NoteListPage />} />
       </Routes>
+      /
     </>
   );
 }

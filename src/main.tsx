@@ -17,6 +17,7 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 1000 * 10, // 다시 조회할 필요가 있는지 판단하는 기준
       gcTime: 1000 * 60 * 10,
+      retry: 0, // 재시도 없음
     },
   },
 });

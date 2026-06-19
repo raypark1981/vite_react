@@ -1,29 +1,20 @@
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 // import type { Folder } from '@/types/folder';
-import type { StudyNote, UpdateStudyNoteInput } from '@/types/note';
+import type { UpdateStudyNoteInput } from '@/types/note';
 import { getStudyNotes } from '@/api/noteApi';
 import { getFolders } from '@/api/folderApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 const NoteListPage = () => {
-  const {
-    data: folders = [],
-    isSuccess: folderLoaded,
-    isLoading: isLoadingFolders,
-    isError: isErrorFolders,
-  } = useQuery({
+  const { data: folders = [], isSuccess: folderLoaded } = useQuery({
     queryKey: ['folders'],
     queryFn: getFolders,
     meta: { loadingMessage: '폴더 불러오는 중...' },
   });
 
-  const {
-    data: notes = [],
-    isLoading: isLoadingNotes,
-    isError: isErrorNotes,
-  } = useQuery({
+  const { data: notes = [] } = useQuery({
     queryKey: ['notes'],
     queryFn: getStudyNotes,
     enabled: folderLoaded,

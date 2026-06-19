@@ -1,8 +1,9 @@
-import { useIsFetching } from '@tanstack/react-query';
-import { useQueryClient } from '@tanstack/react-query';
+import { useIsFetching, useQueryClient } from '@tanstack/react-query';
+
 const GlobalLoadingOverlay = () => {
   const queryClient = useQueryClient();
   const isFetching = useIsFetching();
+  // useIsFetching이 fetching 값을 구독중이어서, 그 시점의 캐시 상태를 읽음
 
   const message =
     (queryClient.getQueryCache().findAll({ fetchStatus: 'fetching' }).at(0)?.meta
