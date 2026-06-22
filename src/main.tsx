@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // 개발 환경에서만 쿼리 상태를 확인할 수 있는 디버그 패널
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { isDev } from '@/config/env.ts';
+import { isDev, isMSWEnabled } from '@/config/env.ts';
 
 import './index.css';
 import App from './App.tsx';
@@ -21,6 +21,11 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+if (isMSWEnabled && isDev) {
+  const { worker } = await import('./mocks/browser');
+  await worker.start({ onUnhandledRequest: 'bypass' });
+}
 
 createRoot(document.getElementById('root')!).render(
   // QueryClientProvider: useQuery 등이 queryClient에 접근할 수 있도록 context 제공

@@ -17,6 +17,8 @@ dist-ssr
 .env.*
 !.env.example
 !.env.development
+# 로컬이라 추가 공용 프로젝트에서는 빼야됨
+!.env.local
 
 # Editor directories and files
 .vscode/*
