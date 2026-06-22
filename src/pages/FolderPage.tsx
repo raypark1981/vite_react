@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import type { Folder } from '@/types/folder';
+import type { Folder, UpdateFolderInput } from '@/types/folder';
 import { getFolders, createFolder, updateFolder, deleteFolder } from '@/api/folderApi';
 import FolderTree from '@/components/folder/FolderTree';
 import Navbar from '@/components/layout/Navbar';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { useToastStore } from '@/stores/useToastStore';
 
 // 임시 초기 데이터 (추후 localStorage 또는 API로 교체)
@@ -24,6 +24,24 @@ const FolderPage: React.FC = () => {
     queryKey: ['folders'],
     queryFn: getFolders,
     meta: { loadingMessage: '폴더 불러오는 중...' },
+  });
+
+  const updateFolderMutation = useMutation({
+    mutationFn: ({ folderId, input }: { folderId: string; input: UpdateFolderInput }) =>
+      updateFolder(folderId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['folders'] });
+    },
+    onError: () => {},
+    meta: { loadingMessage: '수정 중...' },
+  });
+
+  const createFolderMutaion = useMutation({
+    mutationFn: createFolder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['folders'] });
+    },
+    meta: { loadingMessage: '저장 중...' },
   });
 
   // 현재 선택된 폴더 id
@@ -80,20 +98,31 @@ const FolderPage: React.FC = () => {
     try {
       if (editTarget) {
         if (!editTarget.id) return;
-        await updateFolder(editTarget.id, { ...editTarget, name: inputName });
+
+        updateFolderMutation.mutate({
+          folderId: editTarget.id,
+          input: { ...editTarget, name: inputName },
+        });
+
+        // await updateFolder(editTarget.id, { ...editTarget, name: inputName });
+
         // setFolders(prev =>
         //   prev.map(f => (f.id === editTarget.id ? { ...f, name: inputName.trim() } : f)),
         // );
-        await queryClient.invalidateQueries({ queryKey: ['folders'] });
       } else {
         // 새 폴더 생성: 서버 응답을 상태에 반영
-        await createFolder({
+
+        createFolderMutaion.mutate({
           name: inputName.trim(),
           parentId: selectedId,
         });
 
+        // await createFolder({
+        //   name: inputName.trim(),
+        //   parentId: selectedId,
+        // });
+
         // setFolders(prev => [...prev, createdFolder]);
-        await queryClient.invalidateQueries({ queryKey: ['folders'] });
       }
 
       closeModal();
